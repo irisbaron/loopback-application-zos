@@ -1,0 +1,10 @@
+{
+  "customerRecords": {
+    "name": "customerRecords",
+    "connector": "memory"
+  },
+  "creditCardRecords": {
+    "name": "creditCardRecords",
+    "connector": "memory"
+  }
+}
