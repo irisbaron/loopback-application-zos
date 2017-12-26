@@ -70,21 +70,15 @@ In our scenario, the TorCC credit card company holds data regarding the members,
 
 These APIs cover the full spectrum of create, retrieve, update and delete (CRUD) functions
 
-For our example we use three data sources: customers, credit cards and rewards programs. This might be the case in a real production environment where data is split across several databases. Our skeleton application, which is a LoopBack project called Rewards, already contains information about customers and credit-cards. Here we will extend the skeleton application provided, and using step-by-steo instrcutiosn we will build the information regarding rewards program and tie it to the other data.
+For our example we use three data sources: customers, credit cards and rewards programs. This might be the case in a real production environment where data is split across several databases. Our skeleton application, which is a LoopBack project called Rewards, already contains information about customers and credit-cards. In this section will extend the skeleton application provided with the rewards program part, using step-by-step instructions.
 
-By the end of this part, you will have setup your environment and have a running Node.js application. You will have knowledge of basic LB concepts such as datasources, models and relations. In addition you will be able to explore the application's APIs and test it using cURL commands.
+By the end of this part, you will have setup your environment and have a running Node.js application that exposes 4 APIs to manage the Rewards program.  You will gain knowledge about basic LoopBack concepts such as datasources, models and relations. And finally, you will be able to explore the application's APIs and test it using cURL commands.
 
-While this developer journey targets z/OS users, you can create and run the application on any platform, in particular as our example data resides in memory, and is not tied to the platform. In practice z/OS customers probably have their data reside in DB2 or other asset on z/OS and thus will benefit from deploying the backend application on z/OS and collocating the application and the data. Deploying it on a z/OS system would demonstrate that Node.js on z/OS is a first class citizen and it behaves similarly to any other platforms.
+For those who wish to create the application from scratch, we provide detailed instructions under <<<part B>>>
 
+While this developer journey targets z/OS users, you can create and run the application on any platform, in particular as our example data resides in memory, and is not tied to the platform. In practice z/OS customers probably have their data reside in DB2 or other asset on z/OS and thus will benefit from deploying the backend application on z/OS and collocating the application and the data. Deploying the Node.js application on a z/OS system demonstrates that Node.js on z/OS is a first class citizen and it behaves similarly to any other platforms.
 
-
->>>Not in the right place:  In the next section, section ???, we provides additional steps to recreate our complete rewards application from scratch. It provides instructions how to start a LoopBack project and elaborates on more LoopBack concepts such bootstracp and remove methods. By the end of this part you should have a good understanding how to create your Node.js application with LoopBack framework.<<<<
-
-
-
-
-Here are the following steps for our scenario:
-
+Next, We will guide you through the following steps o extend the provided application with the Rewards Program code:
 1. [Clone the Repository](#clone-the-repository) 
 2. [Link Rewards Datasource](#link-rewards-datasource)
 3. [Generate Rewards Model Object](#generate-rewards-model-object)
@@ -95,7 +89,7 @@ Here are the following steps for our scenario:
 
 
 ### Clone the Repository
-To experience with the rewards application you first need to clone the repository locally. 
+To experience with the Rewards application you first need to clone the repository locally. 
 
 ```bash
 git clone https://github.com/ibmruntimes/loopback-demo-zos
@@ -114,13 +108,12 @@ Then cd into the  Rewards directory, which is our root folder for the project.
 cd Rewards
 ```
 
+
 ### Link Rewards Datasource
 
-In this step we set up one or more datasource for the application. Datasources represent backend systems such as databases, external REST APIs, SOAP web services, and storage serviceFor more information, see [Defining data sources (LoopBack documentation)](http://loopback.io/doc/en/lb3/Connecting-models-to-data-sources).
+In this step we set up a datasource for the application. Datasources represent backend systems such as databases, external REST APIs, SOAP web services, and storage serviceFor more information, see [Defining data sources (LoopBack documentation)](http://loopback.io/doc/en/lb3/Connecting-models-to-data-sources). For our example we already generate datasources for customers and credit-cards. Here we will generate the datasource for the rewards programs. 
 
-For our example we already generate datasources for customers and credit cards. Here we will generate the datasource for the rewards programs. To create a datasource, make sure you are in Rewards directory. 
-
-Type the following into your command line:
+To create a datasource, make sure you are in Rewards directory and type the following:
 
 ```bash
 lb datasource
@@ -151,7 +144,7 @@ In the project root directory, type the following:
 lb model
 ```
 
-Just like before, you'll be walked through the process of making a model object, all from the command line. Select the following options:
+Just like before, you'll be walked through the process of making a model object. Select the following options:
 
 ```
 Model : Rewards
@@ -160,15 +153,18 @@ Model's base class: PersistentModel
 Expose Rewards via the REST API : Yes
 Custom plural form (used to build REST URL):
 Common model or server only: common
+Let's add some Customer properties now.
+
+Enter an empty property name when done.
+?Property name: 
+
 ```
 
-The Rewards program has no properties, thus After you get prompted to add a property, hit Enter to end the model creation dialog.
+The Rewards program has no properties, thus after you get prompted to add a property, hit Enter to end the model creation dialog.
 
-Given this application is a Rewards applications, we would want to expose the model via REST APIs. This was not the case for customers and credit-card info, which we prefer to keep secure on the platform.
+Given this application is a Rewards applications, we would want to expose the model via REST APIs. This was not the case for the customers and credit-card information, which we prefer to keep secure on the platform.
 
-
-The result is a new files under `common/model` directory, `rewards.json`. This file keeps all model data in JSON format.
-We already included the rewards.js file which contains the initial JavaScript code and more advanced logic for our extra CRUD functionality.
+The result is a new file under `common/model` directory, `rewards.json`. This file keeps all the model's data in JSON format.
 
 __rewards.json:__
 
@@ -187,6 +183,15 @@ __rewards.json:__
   "methods": {}
 }
 ```
+This steps also results in a `rewards.js` file which contains the initial out-of-the-box JavaScript code to manage the model's REST APIs that cover the CRUD functions for the model. In order to expose additional functionality we created custom methods  of a model, exposed over a custom REST endpoint. All of these methods are under rewares.js file. For our example we added the following remote methods, with members names as parameters:
+
+    createAccount([names]) - create a rewards program account for current credit card holders.
+    getPoints([names]) - query customer information. Check to see if they belong to the same reward program and then collect all the points, aggregate and return the sum.
+    claimPoints([names]) - update users total points by making the appropriate updates to their credit card info.
+    closeAccount([names]) - delete an account if members chose to close the account.
+
+The application highlights the security capability of having the backend application resides on same platform as the data. The credit card and customer information is not exposed and does not leave the platform. All the logic happens inside the platform, at the same location as the data.
+
 
 ### Generate Relations between Models
 
@@ -201,7 +206,7 @@ Our example contains the following relations:
 
 ![Model Relations diagram](./media/ModelRelations.png?raw=true)
 
-Here are the steps to create the Rewards hasMany Customers relation.
+Here are the steps to create the Rewards hasMany Customers relation. 
 
 In the project root directory, type the following command:
 
@@ -238,19 +243,18 @@ The result is seen in `common/model/rewards.json`:
   },
 ```
 
-We already created all other relations, including the Custoemr belongsTo relation to RewardsRepeat.    
+We already created all other relations, including the Custoemr belongsTo relation to Rewards.    
 
 #### Run the Application
 
 In the root directory, Rewards, install the node module dependencies with `npm`, and run the application.
 
 ```bash
-cd loopback-demo-zos
 npm install
 node .
 ```
 
-The output shows the customers, credit cards and rewards program created. It will also include the following lines: 
+The output shows the customers, credit-cards and rewards program created. It will also include the following lines: 
 
 ```javascript
 Web server listening at: http://0.0.0.0:3000
@@ -288,4 +292,5 @@ You should see the amount of credit card rewards points remaining in the program
 
 ### Extra: Full guide to Create the Rewards Application from scratch
 
+In this section we guide you through the full steps to recreate our complete rewards application from scratch. We provide instructions how to start a LoopBack project and elaborates on more LoopBack concepts such bootstracp and remote methods. By the end of this part you should have a solid understanding how to create your Node.js application with LoopBack framework.
 For the steps to create your own Rewards application, please follow this link to [RewardsApplication.md](https://github.com/ibmruntimes/loopback-demo-zos/blob/master/RewardsApplication.md).
