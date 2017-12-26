@@ -137,7 +137,6 @@ The tool updates the applications OpenAPI (Swagger 2.0) definition file and the 
 In this step we add a model to the project. A _LoopBack model_ is a JavaScript object that represents backend data such as databases. They are stored in JSON format and specify properties and other characteristics of the API. Models are connected to backend systems via data sources. Every LoopBack application has a set of default models, which you can extend to suit your application's requirements. You can also define custom models. For more information on models, see [Defining models (LoopBack documentation)](http://loopback.io/doc/en/lb3/Defining-models.html).
 
 In our example we have three models: customer, credit-card and rewards. Each of these models has its own properties and connects to its respective datasource.  The skeleton application already contains the models for customers and credit-cards. 
-
 ![Models diagram](./media/Models.png?raw=true)
 
 To enerate the rewards model, type the following in the project root directory:
